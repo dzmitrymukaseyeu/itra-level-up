@@ -1,4 +1,4 @@
-const App = require('./app');
+const { App } = require('./app');
 
 const app = new App();
 
@@ -22,6 +22,12 @@ app.addDeleteHandler('/books/:id', (req, res) => {
 })
 
 app.addPutHandler('/books/:id', (req, res) => {
+  res.statusCode = 200
+  res.setHeader("Content-Type", "text/plain");
+  res.end('put request')
+})
+
+app.addPutHandler('/books/123', (req, res) => {
   res.statusCode = 200
   res.setHeader("Content-Type", "text/plain");
   res.end('put request')

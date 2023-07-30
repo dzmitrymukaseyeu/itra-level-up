@@ -1,9 +1,12 @@
-﻿import {FastifyInstance, FastifyPluginOptions, FastifyRequest} from 'fastify'
+﻿import {FastifyInstance, FastifyRequest} from 'fastify'
+import {IQuerystring} from "./models";
 
-const bookRoute = async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
+export function registerRoutes(fastify: FastifyInstance) {
     const mongodbCollection = fastify.mongo.db?.collection('Books');
-    
-    fastify.get('/books', async (request, reply) => {
+
+    fastify.get<{
+        Querystring: IQuerystring
+    }>('/books', async (request, reply) => {
         try {
             // const mssqlTable = await fastify.mssql.pool.connect()
             // console.log(mssqlTable, 'mssqlTbl')
@@ -13,32 +16,30 @@ const bookRoute = async (fastify: FastifyInstance, options: FastifyPluginOptions
         } catch {
             throw new Error('Error')
         }
-        
+
     })
-    
-    fastify.get('/books/:bookId', async (request: FastifyRequest<{Params: {bookId: string}}>, reply) => {
+
+    fastify.get('/books/:bookId', async (request: FastifyRequest<{ Params: { bookId: string } }>, reply) => {
         try {
             const bookId = parseInt(request.params.bookId, 10);
             const book = await mongodbCollection?.findOne({id: parseInt(request.params.bookId)})
-            if(!book) {
+            if (!book) {
                 return reply.status(404).send({message: 'Book not found'})
             }
-                return book;
+            return book;
         } catch (e) {
             throw new Error('Error')
         }
     })
-    
-    fastify.post('/books', async (request: FastifyRequest<{Body: {title: string}}>, reply) => {
-       try {
-           const newBook = request.body;
-           
-           const result = await mongodbCollection?.insertOne(newBook)
-           console.log(result)
-       } catch (e) {
-           throw new Error('Error')
-       }
+
+    fastify.post('/books', async (request: FastifyRequest<{ Body: { title: string } }>, reply) => {
+        try {
+            const newBook = request.body;
+
+            const result = await mongodbCollection?.insertOne(newBook)
+            console.log(result)
+        } catch (e) {
+            throw new Error('Error')
+        }
     })
 }
-
-export default bookRoute;
